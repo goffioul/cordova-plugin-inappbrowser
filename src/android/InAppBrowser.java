@@ -507,6 +507,7 @@ public class InAppBrowser extends CordovaPlugin {
                         if (dialog != null) {
                             dialog.dismiss();
                             dialog = null;
+                            childView.destroy();
                         }
                     }
                 });
