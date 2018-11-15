@@ -53,6 +53,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebViewDatabase;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -97,6 +98,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_ERROR_EVENT = "loaderror";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
+    private static final String FORM_DATA = "formdata";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
@@ -122,6 +124,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
+    private boolean formData = true;
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
@@ -643,6 +646,10 @@ public class InAppBrowser extends CordovaPlugin {
                     clearSessionCache = cache.equals("yes") ? true : false;
                 }
             }
+            String form = features.get(FORM_DATA);
+            if (form != null) {
+                formData = form.equals("yes") ? true : false;
+            }
             String shouldPause = features.get(SHOULD_PAUSE);
             if (shouldPause != null) {
                 shouldPauseInAppBrowser = shouldPause.equals("yes") ? true : false;
@@ -961,6 +968,11 @@ public class InAppBrowser extends CordovaPlugin {
                     CookieManager.getInstance().removeAllCookie();
                 } else if (clearSessionCache) {
                     CookieManager.getInstance().removeSessionCookie();
+                }
+
+                if (!formData) {
+                    settings.setSaveFormData(false);
+                    WebViewDatabase.getInstance(cordova.getActivity()).clearFormData();
                 }
 
                 // Enable Thirdparty Cookies on >=Android 5.0 device
